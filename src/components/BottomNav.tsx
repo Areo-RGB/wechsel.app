@@ -1,3 +1,4 @@
+import React from 'react';
 import { Users, LayoutDashboard, Timer, Replace, BarChart2 } from 'lucide-react';
 import { useStore } from '../store';
 import { cn } from '../lib/utils';

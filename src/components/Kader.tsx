@@ -39,7 +39,7 @@ function PlayerAvatar({ player, isOverlay = false }: { player: Player, isOverlay
   );
 }
 
-function DraggablePlayer({ player }: { player: Player }) {
+function DraggablePlayer({ player }: { player: Player; key?: string }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: `player-${player.id}`,
     data: player
@@ -74,7 +74,7 @@ function DroppableZone({ id, title, players }: { id: string, title: string, play
   );
 }
 
-function DroppableSlot({ position, occupant }: { position: typeof POSITIONS[0], occupant?: Player }) {
+function DroppableSlot({ position, occupant }: { position: typeof POSITIONS[0], occupant?: Player; key?: string }) {
   const { setNodeRef, isOver } = useDroppable({ id: `slot-${position.id}` });
   
   return (

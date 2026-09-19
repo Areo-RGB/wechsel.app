@@ -45,23 +45,23 @@ export const useStore = create<StoreState>()(
       activeTab: 'KADER',
 
       togglePlayerStatus: (playerId) => set((state) => {
-        const players = state.players.map(p => {
+        const players: Player[] = state.players.map(p => {
           if (p.id !== playerId) return p;
-          if (p.status === 'OUT') return { ...p, status: 'BENCH' };
-          if (p.status === 'BENCH') return { ...p, status: 'OUT', positionId: null };
-          if (p.status === 'FIELD') return { ...p, status: 'BENCH', positionId: null };
+          if (p.status === 'OUT') return { ...p, status: 'BENCH' as PlayerStatus };
+          if (p.status === 'BENCH') return { ...p, status: 'OUT' as PlayerStatus, positionId: null };
+          if (p.status === 'FIELD') return { ...p, status: 'BENCH' as PlayerStatus, positionId: null };
           return p;
         });
         return { players };
       }),
 
       movePlayerToSlot: (playerId, positionId) => set((state) => {
-        const players = state.players.map(p => {
+        const players: Player[] = state.players.map(p => {
           if (p.id !== playerId && p.positionId === positionId) {
-            return { ...p, status: 'BENCH', positionId: null };
+            return { ...p, status: 'BENCH' as PlayerStatus, positionId: null };
           }
           if (p.id === playerId) {
-            return { ...p, status: 'FIELD', positionId };
+            return { ...p, status: 'FIELD' as PlayerStatus, positionId };
           }
           return p;
         });
