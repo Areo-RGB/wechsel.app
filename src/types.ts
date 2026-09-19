@@ -30,5 +30,5 @@ export interface PositionSlot {
   y: number; // percentage 0-100
 }
 
-export type TabId = 'KADER' | 'AUFSTELLUNG' | 'MATCH' | 'WECHSEL' | 'DATEN';
+export type TabId = 'KADER' | 'AUFSTELLUNG' | 'MATCH' | 'DATEN';
 

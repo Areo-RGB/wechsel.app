@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, LayoutDashboard, Timer, Replace, BarChart2 } from 'lucide-react';
+import { Users, LayoutDashboard, BarChart2 } from 'lucide-react';
 import { useStore } from '../store';
 import { cn } from '../lib/utils';
 import { TabId } from '../types';
@@ -7,7 +7,6 @@ import { TabId } from '../types';
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'KADER', label: 'Kader', icon: Users },
   { id: 'AUFSTELLUNG', label: 'Aufstellung', icon: LayoutDashboard },
-  { id: 'WECHSEL', label: 'Wechsel', icon: Replace },
   { id: 'DATEN', label: 'Daten', icon: BarChart2 },
 ];
 

@@ -37,7 +37,6 @@ export function Aufstellung() {
     selectedFieldPlayerId, 
     selectFieldPlayer, 
     movePlayerToSlot, 
-    planWechsel, 
     updatePositionSlot, 
     resetPositionsToFormation, 
     clearField, 
@@ -151,10 +150,10 @@ export function Aufstellung() {
     setSheetTargetSlot(null);
   };
 
-  // Substitute active managePlayer with bench player
+  // Substitute active managePlayer with bench player directly
   const handleExecuteSubstitute = (benchPlayerId: string) => {
-    if (!managePlayer) return;
-    planWechsel(managePlayer.id, benchPlayerId);
+    if (!managePlayer || !managePlayer.positionId) return;
+    dragPlayer(benchPlayerId, 'FIELD', managePlayer.positionId);
     setSubstituteSheetOpen(false);
     setManagePlayer(null);
   };

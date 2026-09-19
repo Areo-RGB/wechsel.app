@@ -8,8 +8,6 @@ import { useStore } from './store';
 import { BottomNav } from './components/BottomNav';
 import { Kader } from './components/Kader';
 import { Aufstellung } from './components/Aufstellung';
-import { Match } from './components/Match';
-import { Wechsel } from './components/Wechsel';
 import { Daten } from './components/Daten';
 import { Toaster } from './components/ui/sonner';
 
@@ -28,7 +26,6 @@ export default function App() {
       case 'KADER': return <Kader />;
       case 'AUFSTELLUNG':
       case 'MATCH': return <Aufstellung />;
-      case 'WECHSEL': return <Wechsel />;
       case 'DATEN': return <Daten />;
       default: return null;
     }
