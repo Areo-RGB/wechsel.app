@@ -36,11 +36,6 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-[100dvh] w-full bg-stone-950 text-stone-100 overflow-hidden font-sans select-none">
-      <header className="h-14 shrink-0 flex items-center justify-center space-x-2.5 border-b border-stone-800 bg-stone-950 z-10">
-        <img src="/assets/logo.png" alt="Logo" className="w-8 h-8 object-contain" referrerPolicy="no-referrer" onError={(e) => (e.target as HTMLElement).style.display = 'none'} />
-        <h1 className="text-lg font-bold tracking-widest uppercase text-stone-200">Wexel</h1>
-      </header>
-      
       <main className="flex-1 relative overflow-hidden">
         {renderTab()}
       </main>

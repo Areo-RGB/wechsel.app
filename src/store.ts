@@ -33,7 +33,8 @@ interface StoreState {
   formationId: string;
   positions: PositionSlot[];
   
-  togglePlayerStatus: (playerId: string) => void;
+  cyclePlayerStatus: (playerId: string) => void;
+  toggleFieldBench: (playerId: string) => void;
   togglePlayerSelected: (playerId: string) => void;
   setPlayerSelected: (playerId: string, selected: boolean) => void;
   selectAllPlayers: (selected: boolean) => void;
@@ -69,16 +70,39 @@ export const useStore = create<StoreState>()(
       formationId: '2-3-2',
       positions: FORMATION_PRESETS[0].slots,
 
-      togglePlayerStatus: (playerId) => set((state) => {
+      cyclePlayerStatus: (playerId) => set((state) => {
         const players: Player[] = state.players.map(p => {
           if (p.id !== playerId) return p;
-          if (p.status === 'OUT') return { ...p, status: 'BENCH' as PlayerStatus };
-          if (p.status === 'BENCH') return { ...p, status: 'OUT' as PlayerStatus, positionId: null };
-          if (p.status === 'FIELD') return { ...p, status: 'BENCH' as PlayerStatus, positionId: null };
-          return p;
+          
+          let nextStatus: PlayerStatus;
+          if (p.status === 'FIELD') nextStatus = 'BENCH';
+          else if (p.status === 'BENCH') nextStatus = 'OUT';
+          else nextStatus = 'FIELD';
+
+          return { 
+            ...p, 
+            status: nextStatus, 
+            positionId: nextStatus === 'FIELD' ? p.positionId : null 
+          };
         });
-        return { players };
+
+        // Clean up wechselQueue if player goes OUT
+        const target = state.players.find(p => p.id === playerId);
+        const isNowOut = target?.status !== 'OUT' && players.find(p => p.id === playerId)?.status === 'OUT';
+        const wechselQueue = isNowOut
+          ? state.wechselQueue.filter(w => w.outPlayerId !== playerId && w.inPlayerId !== playerId)
+          : state.wechselQueue;
+
+        return { players, wechselQueue };
       }),
+
+      togglePlayerStatus: (playerId) => {
+        get().cyclePlayerStatus(playerId);
+      },
+
+      toggleFieldBench: (playerId) => {
+        get().cyclePlayerStatus(playerId);
+      },
 
       togglePlayerSelected: (playerId) => set((state) => {
         const target = state.players.find(p => p.id === playerId);

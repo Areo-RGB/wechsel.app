@@ -13,7 +13,12 @@ import {
   Trash2,
   CheckCircle2,
   CircleDot,
-  MinusCircle
+  MinusCircle,
+  Shirt,
+  Armchair,
+  CircleSlash,
+  ChevronRight,
+  ArrowUpDown
 } from 'lucide-react';
 import { Button } from './ui/button';
 import {
@@ -27,7 +32,7 @@ import {
 export function Kader() {
   const { 
     players, 
-    togglePlayerSelected, 
+    cyclePlayerStatus,
     selectAllPlayers, 
     addPlayer, 
     deletePlayer, 
@@ -88,297 +93,133 @@ export function Kader() {
 
   return (
     <div className="flex flex-col h-full bg-stone-950 text-stone-100 pb-20 overflow-y-auto">
-      {/* Top Header Summary Card */}
-      <div className="p-4 bg-stone-900 border-b border-stone-800 shrink-0">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center space-x-2.5">
-            <div className="p-2 bg-emerald-950/80 border border-emerald-800/60 rounded-xl text-emerald-400">
-              <Users size={20} />
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-stone-100 tracking-tight">Kader & Anwesenheit</h2>
-              <p className="text-xs text-stone-400">
-                Wähle die für das Spiel verfügbaren Spieler aus
-              </p>
-            </div>
-          </div>
-
-          <Button
-            size="sm"
-            onClick={() => setIsAddDialogOpen(true)}
-            className="h-9 px-3 bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 rounded-xl flex items-center space-x-1.5"
-          >
-            <UserPlus size={15} />
-            <span className="text-xs font-semibold">Neu</span>
-          </Button>
-        </div>
-
-        {/* Counter Badge & Progress */}
-        <div className="bg-stone-950/80 rounded-2xl p-3 border border-stone-800/80">
-          <div className="flex items-center justify-between text-xs mb-2">
-            <span className="text-stone-300 font-medium">
-              Verfügbar im Kader:
-            </span>
-            <div className="flex items-center space-x-2">
-              <span className="font-bold text-emerald-400 font-mono text-sm">
-                {selectedCount} <span className="text-stone-500 text-xs font-normal">/ {totalCount}</span>
-              </span>
-              <span className="text-[10px] uppercase font-semibold text-stone-400 bg-stone-800 px-2 py-0.5 rounded-full">
-                {fieldPlayers.length} Feld · {benchPlayers.length} Bank
-              </span>
-            </div>
-          </div>
-
-          {/* Progress bar */}
-          <div className="w-full bg-stone-800 h-2 rounded-full overflow-hidden flex">
-            <div 
-              className="bg-emerald-500 h-full transition-all duration-300"
-              style={{ width: `${totalCount > 0 ? (selectedCount / totalCount) * 100 : 0}%` }}
-            />
-          </div>
-
-          {/* Quick select / deselect actions */}
-          <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-stone-800/60 text-xs">
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => selectAllPlayers(true)}
-                disabled={selectedCount === totalCount}
-                className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-stone-800/90 hover:bg-stone-700/80 text-stone-300 hover:text-emerald-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <CheckCheck size={14} className="text-emerald-400" />
-                <span className="font-medium text-[11px]">Alle auswählen</span>
-              </button>
-
-              <button
-                onClick={() => selectAllPlayers(false)}
-                disabled={selectedCount === 0}
-                className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-stone-800/90 hover:bg-stone-700/80 text-stone-300 hover:text-rose-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <X size={14} className="text-rose-400" />
-                <span className="font-medium text-[11px]">Alle abwählen</span>
-              </button>
-            </div>
-
-            <button
-              onClick={() => setTab('AUFSTELLUNG')}
-              className="flex items-center space-x-1 text-emerald-400 hover:text-emerald-300 font-semibold text-[11px] group"
-            >
-              <span>Zur Aufstellung</span>
-              <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+      {/* Top Section: Tab Bar (Kader, Nummern, Taktik style) */}
+      <div className="bg-stone-900/50 border-b border-stone-800">
+        <div className="flex items-center px-4 h-12">
+          <div className="flex items-center space-x-6">
+            <button className="relative py-3 px-1 text-sm font-bold text-stone-100 flex items-center space-x-1">
+              <span>Kader</span>
+              <div className="w-4 h-4 rounded-full bg-rose-600 text-[10px] flex items-center justify-center font-bold">!</div>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-stone-100 rounded-full" />
+            </button>
+            <button className="py-3 px-1 text-sm font-bold text-stone-500 flex items-center space-x-1">
+              <span>Nummern</span>
+              <div className="w-4 h-4 rounded-full bg-rose-600 text-[10px] flex items-center justify-center font-bold">!</div>
+            </button>
+            <button className="py-3 px-1 text-sm font-bold text-stone-500 flex items-center space-x-1 group">
+              <span>Taktik</span>
+              <ChevronRight size={14} className="text-stone-600 group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Search & Filter Bar */}
-      <div className="p-3 bg-stone-950 sticky top-0 z-20 border-b border-stone-800/80 space-y-2.5 backdrop-blur-md bg-stone-950/90">
-        {/* Search input */}
-        <div className="relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Spieler suchen..."
-            className="w-full h-10 pl-9 pr-9 bg-stone-900 border border-stone-800 rounded-xl text-sm text-stone-100 placeholder:text-stone-500 focus:outline-none focus:border-emerald-500/80 focus:ring-1 focus:ring-emerald-500/50"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-200"
-            >
-              <X size={14} />
-            </button>
-          )}
+      {/* Stats row from video */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-stone-800/50 bg-stone-950 sticky top-0 z-20">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1.5">
+            <Shirt size={18} className="text-stone-400" />
+            <span className="text-sm font-bold text-stone-200">{fieldPlayers.length} / {positions.length}</span>
+          </div>
+          <div className="flex items-center space-x-1.5">
+            <Armchair size={18} className="text-stone-400" />
+            <span className="text-sm font-bold text-stone-200">{benchPlayers.length} / 7</span>
+          </div>
         </div>
-
-        {/* Filter Pills */}
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setFilter('ALL')}
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center space-x-1.5",
-              filter === 'ALL' 
-                ? "bg-stone-200 text-stone-950" 
-                : "bg-stone-900 text-stone-400 hover:text-stone-200 border border-stone-800"
-            )}
-          >
-            <span>Alle</span>
-            <span className={cn(
-              "text-[10px] px-1.5 py-0.2 rounded-full",
-              filter === 'ALL' ? "bg-stone-400/40 text-stone-900" : "bg-stone-800 text-stone-400"
-            )}>
-              {totalCount}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setFilter('SELECTED')}
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center space-x-1.5",
-              filter === 'SELECTED' 
-                ? "bg-emerald-500 text-stone-950" 
-                : "bg-stone-900 text-stone-400 hover:text-stone-200 border border-stone-800"
-            )}
-          >
-            <span>Im Kader</span>
-            <span className={cn(
-              "text-[10px] px-1.5 py-0.2 rounded-full",
-              filter === 'SELECTED' ? "bg-emerald-700/50 text-emerald-950 font-bold" : "bg-stone-800 text-stone-400"
-            )}>
-              {selectedCount}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setFilter('OUT')}
-            className={cn(
-              "px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center space-x-1.5",
-              filter === 'OUT' 
-                ? "bg-stone-700 text-stone-100" 
-                : "bg-stone-900 text-stone-400 hover:text-stone-200 border border-stone-800"
-            )}
-          >
-            <span>Abwesend</span>
-            <span className={cn(
-              "text-[10px] px-1.5 py-0.2 rounded-full",
-              filter === 'OUT' ? "bg-stone-600 text-stone-200" : "bg-stone-800 text-stone-400"
-            )}>
-              {outPlayers.length}
-            </span>
-          </button>
-        </div>
+        
+        <button className="flex items-center space-x-1.5 text-stone-400 hover:text-stone-200 transition-colors">
+          <ArrowUpDown size={16} />
+          <span className="text-xs font-bold uppercase tracking-wider">sortieren</span>
+        </button>
       </div>
 
       {/* Players List */}
-      <div className="p-3 space-y-2 flex-1">
+      <div className="flex-1">
         {filteredPlayers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center text-stone-500 space-y-2">
             <Users size={36} className="opacity-40" />
             <p className="font-medium text-sm">Keine Spieler gefunden</p>
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="text-xs text-emerald-400 underline"
-              >
-                Suche zurücksetzen
-              </button>
-            )}
           </div>
         ) : (
-          filteredPlayers.map(player => {
-            const isSelected = player.status !== 'OUT';
-            const isField = player.status === 'FIELD';
-            const isBench = player.status === 'BENCH';
-            const avatarUrl = getPlayerAvatar(player.name, player.avatar);
-            const currentPosition = positions.find(pos => pos.id === player.positionId);
+          <div className="divide-y divide-stone-800/40">
+            {filteredPlayers.map(player => {
+              const isSelected = player.status !== 'OUT';
+              const isField = player.status === 'FIELD';
+              const avatarUrl = getPlayerAvatar(player.name, player.avatar);
 
-            return (
-              <div
-                key={player.id}
-                onClick={() => togglePlayerSelected(player.id)}
-                className={cn(
-                  "group flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer select-none",
-                  isSelected
-                    ? "bg-stone-900/90 border-stone-800 hover:border-emerald-500/50"
-                    : "bg-stone-950/60 border-stone-900/80 opacity-60 hover:opacity-85 hover:border-stone-800"
-                )}
-              >
-                {/* Left: Avatar + Details */}
-                <div className="flex items-center space-x-3 min-w-0 flex-1">
-                  {/* Avatar */}
-                  <div className={cn(
-                    "w-12 h-12 rounded-full overflow-hidden relative shrink-0 flex items-center justify-center font-bold text-sm transition-all",
-                    isField && "ring-2 ring-emerald-500 ring-offset-2 ring-offset-stone-950 bg-stone-900 text-emerald-400",
-                    isBench && "ring-2 ring-amber-500/80 ring-offset-2 ring-offset-stone-950 bg-stone-800 text-stone-200",
-                    !isSelected && "bg-stone-900 text-stone-500 border border-stone-800 grayscale"
-                  )}>
-                    {avatarUrl ? (
-                      <img
-                        src={avatarUrl}
-                        alt={player.name}
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      player.name.substring(0, 2).toUpperCase()
-                    )}
-                  </div>
-
-                  {/* Name + Status Badges */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center space-x-2">
-                      <span className={cn(
-                        "font-semibold text-sm truncate",
-                        isSelected ? "text-stone-100" : "text-stone-400"
+              return (
+                <div
+                  key={player.id}
+                  onClick={() => cyclePlayerStatus(player.id)}
+                  className={cn(
+                    "flex items-center py-2 px-4 transition-colors cursor-pointer select-none active:bg-stone-900/50",
+                    player.status === 'OUT' && "bg-stone-900/10"
+                  )}
+                >
+                  {/* Left Column: Avatar + Name */}
+                  <div className="flex items-center flex-1 min-w-0 mr-4">
+                    <div className={cn(
+                      "w-12 h-12 rounded-full overflow-hidden shrink-0 border-2 border-stone-800 transition-opacity",
+                      player.status === 'OUT' && "opacity-40 grayscale"
+                    )}>
+                      {avatarUrl ? (
+                        <img
+                          src={avatarUrl}
+                          alt={player.name}
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-stone-800 flex items-center justify-center text-xs font-bold text-stone-400">
+                          {player.name.substring(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div className="ml-3 min-w-0">
+                      <p className={cn(
+                        "text-sm font-bold truncate transition-colors",
+                        player.status !== 'OUT' ? "text-stone-100" : "text-stone-600"
                       )}>
                         {player.name}
-                      </span>
+                      </p>
+                      {player.status === 'OUT' && (
+                        <p className="text-[10px] font-bold text-stone-600 uppercase">n.n.</p>
+                      )}
                     </div>
+                  </div>
 
-                    <div className="flex items-center space-x-1.5 mt-1">
-                      {isField && (
-                        <span className="inline-flex items-center space-x-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-950 text-emerald-400 border border-emerald-800/60">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          <span>Feld {currentPosition?.label ? `(${currentPosition.label})` : ''}</span>
-                        </span>
+                  {/* Right Column: 3-State Toggle Button */}
+                  <div className="shrink-0 flex flex-col items-center">
+                    <div
+                      className={cn(
+                        "w-20 h-12 flex flex-col items-center justify-center rounded-xl transition-all border",
+                        player.status === 'FIELD' && "bg-emerald-500/10 border-emerald-500/40 text-emerald-400",
+                        player.status === 'BENCH' && "bg-amber-500/10 border-amber-500/30 text-amber-400",
+                        player.status === 'OUT' && "bg-stone-900/50 border-stone-800 text-stone-600"
                       )}
-
-                      {isBench && (
-                        <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-950/80 text-amber-400 border border-amber-800/40">
-                          Bank · Bereit
-                        </span>
-                      )}
-
-                      {!isSelected && (
-                        <span className="inline-flex items-center text-[10px] font-medium tracking-wider px-2 py-0.5 rounded-md bg-stone-900 text-stone-500 border border-stone-800">
-                          Abwesend
-                        </span>
+                    >
+                      {player.status === 'FIELD' ? (
+                        <>
+                          <Shirt size={22} strokeWidth={2.5} className="mb-0.5" />
+                          <span className="text-[9px] font-black uppercase tracking-tighter leading-none">Aufgestellt</span>
+                        </>
+                      ) : player.status === 'BENCH' ? (
+                        <>
+                          <Armchair size={22} strokeWidth={2.5} className="mb-0.5" />
+                          <span className="text-[9px] font-black uppercase tracking-tighter leading-none">Bank</span>
+                        </>
+                      ) : (
+                        <>
+                          <CircleSlash size={22} strokeWidth={2.5} className="mb-0.5" />
+                          <span className="text-[9px] font-black uppercase tracking-tighter leading-none">n.n.</span>
+                        </>
                       )}
                     </div>
                   </div>
                 </div>
-
-                {/* Right: Toggle Button & Delete */}
-                <div className="flex items-center space-x-2 shrink-0 ml-2" onClick={(e) => e.stopPropagation()}>
-                  {/* Select / Deselect Pill Button */}
-                  <button
-                    onClick={() => togglePlayerSelected(player.id)}
-                    className={cn(
-                      "h-9 px-3 rounded-xl flex items-center space-x-1.5 font-medium text-xs transition-all active:scale-95 border",
-                      isSelected
-                        ? "bg-emerald-500 text-stone-950 border-emerald-400 font-bold shadow-md shadow-emerald-950/40"
-                        : "bg-stone-900 hover:bg-stone-800 text-stone-400 border-stone-800 hover:text-stone-200"
-                    )}
-                  >
-                    {isSelected ? (
-                      <>
-                        <Check size={14} strokeWidth={3} />
-                        <span>Dabei</span>
-                      </>
-                    ) : (
-                      <>
-                        <MinusCircle size={14} />
-                        <span>Fehlt</span>
-                      </>
-                    )}
-                  </button>
-
-                  {/* Delete button */}
-                  <button
-                    onClick={() => setPlayerToDelete({ id: player.id, name: player.name })}
-                    className="p-2 text-stone-600 hover:text-rose-400 hover:bg-rose-950/30 rounded-xl transition-colors"
-                    title="Spieler löschen"
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              </div>
-            );
-          })
+              );
+            })}
+          </div>
         )}
       </div>
 
