@@ -71,29 +71,26 @@ export const useStore = create<StoreState>()(
       positions: FORMATION_PRESETS[0].slots,
 
       cyclePlayerStatus: (playerId) => set((state) => {
+        const target = state.players.find(p => p.id === playerId);
+        if (!target) return state;
+
+        const isCurrentlyField = target.status === 'FIELD';
+        const nextStatus: PlayerStatus = isCurrentlyField ? 'BENCH' : 'FIELD';
+
         const players: Player[] = state.players.map(p => {
           if (p.id !== playerId) return p;
-          
-          let nextStatus: PlayerStatus;
-          if (p.status === 'FIELD') nextStatus = 'BENCH';
-          else if (p.status === 'BENCH') nextStatus = 'OUT';
-          else nextStatus = 'FIELD';
-
           return { 
             ...p, 
             status: nextStatus, 
-            positionId: nextStatus === 'FIELD' ? p.positionId : null 
+            positionId: null 
           };
         });
 
-        // Clean up wechselQueue if player goes OUT
-        const target = state.players.find(p => p.id === playerId);
-        const isNowOut = target?.status !== 'OUT' && players.find(p => p.id === playerId)?.status === 'OUT';
-        const wechselQueue = isNowOut
-          ? state.wechselQueue.filter(w => w.outPlayerId !== playerId && w.inPlayerId !== playerId)
-          : state.wechselQueue;
+        const selectedFieldPlayerId = state.selectedFieldPlayerId === playerId && nextStatus !== 'FIELD'
+          ? null 
+          : state.selectedFieldPlayerId;
 
-        return { players, wechselQueue };
+        return { players, selectedFieldPlayerId };
       }),
 
       togglePlayerStatus: (playerId) => {
@@ -386,12 +383,11 @@ export const useStore = create<StoreState>()(
       }),
 
       autoFillField: () => set((state) => {
+        const maxFieldCount = state.positions?.length || 8;
         const currentFieldCount = state.players.filter(p => p.status === 'FIELD').length;
-        const availableSlots = state.positions.filter(pos => 
-          !state.players.some(p => p.status === 'FIELD' && p.positionId === pos.id)
-        );
+        const needed = maxFieldCount - currentFieldCount;
 
-        if (availableSlots.length === 0) {
+        if (needed <= 0) {
           toast('Aufstellung ist bereits voll');
           return state;
         }
@@ -410,24 +406,20 @@ export const useStore = create<StoreState>()(
           return state;
         }
 
-        const newPlayers = [...state.players];
-        let assigned = 0;
-
-        for (let i = 0; i < availableSlots.length && i < candidates.length; i++) {
-          const slot = availableSlots[i];
-          const candidate = candidates[i];
-          const idx = newPlayers.findIndex(p => p.id === candidate.id);
-          if (idx !== -1) {
-            newPlayers[idx] = {
-              ...newPlayers[idx],
-              status: 'FIELD',
-              positionId: slot.id
+        const toAdd = candidates.slice(0, needed);
+        const toAddIds = new Set(toAdd.map(p => p.id));
+        const newPlayers = state.players.map(p => {
+          if (toAddIds.has(p.id)) {
+            return {
+              ...p,
+              status: 'FIELD' as PlayerStatus,
+              positionId: null
             };
-            assigned++;
           }
-        }
+          return p;
+        });
 
-        toast(`${assigned} Spieler automatisch aufgestellt`);
+        toast(`${toAdd.length} Spieler automatisch aufgestellt`);
         return { players: newPlayers, selectedFieldPlayerId: null };
       }),
 

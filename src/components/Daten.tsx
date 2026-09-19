@@ -1,6 +1,7 @@
 import { useStore } from '../store';
 import { formatTime } from '../lib/utils';
 import { getPlayerAvatar } from '../lib/avatars';
+import { FullscreenButton } from './FullscreenButton';
 import {
   Table,
   TableBody,
@@ -29,9 +30,12 @@ export function Daten() {
         <h2 className="text-xs font-semibold uppercase tracking-[0.32px] text-[#525252]">
           Spieldaten & Einsatzzeiten
         </h2>
-        <span className="font-mono text-xs text-[#161616] font-bold">
-          {stats.length} Spieler
-        </span>
+        <div className="flex items-center space-x-2">
+          <span className="font-mono text-xs text-[#161616] font-bold">
+            {stats.length} Spieler
+          </span>
+          <FullscreenButton />
+        </div>
       </div>
 
       <div className="flex-1 overflow-auto">

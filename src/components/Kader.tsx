@@ -20,6 +20,7 @@ import {
   ArrowUpDown
 } from 'lucide-react';
 import { Button } from './ui/button';
+import { FullscreenButton } from './FullscreenButton';
 import {
   Dialog,
   DialogContent,
@@ -47,32 +48,25 @@ export function Kader() {
 
   // Stats calculation
   const totalCount = players.length;
-  const selectedPlayers = players.filter(p => p.status !== 'OUT');
   const fieldPlayers = players.filter(p => p.status === 'FIELD');
-  const benchPlayers = players.filter(p => p.status === 'BENCH');
-  const outPlayers = players.filter(p => p.status === 'OUT');
-  const selectedCount = selectedPlayers.length;
+  const benchPlayers = players.filter(p => p.status !== 'FIELD');
+  const maxFieldCount = positions?.length || 8;
 
   // Filter and search
   const filteredPlayers = useMemo(() => {
     return players
       .filter(p => {
-        if (filter === 'SELECTED') return p.status !== 'OUT';
-        if (filter === 'OUT') return p.status === 'OUT';
-        return true;
-      })
-      .filter(p => {
         if (!searchQuery.trim()) return true;
         return p.name.toLowerCase().includes(searchQuery.toLowerCase().trim());
       })
       .sort((a, b) => {
-        // Selected players first, then alphabetically
-        const aSelected = a.status !== 'OUT';
-        const bSelected = b.status !== 'OUT';
-        if (aSelected !== bSelected) return aSelected ? -1 : 1;
+        // Aufgestellt players first, then alphabetically
+        const aField = a.status === 'FIELD';
+        const bField = b.status === 'FIELD';
+        if (aField !== bField) return aField ? -1 : 1;
         return a.name.localeCompare(b.name, 'de');
       });
-  }, [players, filter, searchQuery]);
+  }, [players, searchQuery]);
 
   const handleAddPlayerSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +88,7 @@ export function Kader() {
     <div className="flex flex-col h-full bg-white text-[#161616] pb-20 overflow-y-auto select-none">
       {/* Top Section: Tab Bar (Kader, Nummern) - 36px condensed */}
       <div className="bg-[#f4f4f4] border-b border-[#e0e0e0] shrink-0">
-        <div className="flex items-center px-3 h-9">
+        <div className="flex items-center justify-between px-3 h-9">
           <div className="flex items-center space-x-4">
             <button className="relative py-2 px-1 text-xs font-semibold text-[#161616] flex items-center space-x-1">
               <span>Kader</span>
@@ -106,20 +100,22 @@ export function Kader() {
               <div className="w-3.5 h-3.5 bg-[#da1e28] text-white text-[9px] flex items-center justify-center font-bold">!</div>
             </button>
           </div>
+          <FullscreenButton />
         </div>
       </div>
 
       {/* Stats row - 28px condensed */}
       <div className="flex items-center justify-between px-3 h-7 border-b border-[#e0e0e0] bg-white sticky top-0 z-20 shrink-0">
         <div className="flex items-center space-x-3 text-xs">
-          <div className="flex items-center space-x-1 text-[#525252]">
+          <div className="flex items-center space-x-1.5 text-[#525252]">
             <Shirt size={13} className="text-[#0f62fe]" />
-            <span className="font-mono text-xs font-semibold text-[#161616]">{fieldPlayers.length}/{positions.length}</span>
+            <span className="text-[11px] text-[#525252]">Aufgestellt:</span>
+            <span className="font-mono text-xs font-semibold text-[#161616]">{fieldPlayers.length}/{maxFieldCount}</span>
           </div>
           <span className="text-[#e0e0e0]">|</span>
-          <div className="flex items-center space-x-1 text-[#525252]">
-            <Armchair size={13} className="text-[#525252]" />
-            <span className="font-mono text-xs font-semibold text-[#161616]">{benchPlayers.length} Bank</span>
+          <div className="flex items-center space-x-1.5 text-[#525252]">
+            <span className="text-[11px] text-[#525252]">Nicht aufgestellt:</span>
+            <span className="font-mono text-xs font-semibold text-[#161616]">{benchPlayers.length}</span>
           </div>
         </div>
         
@@ -143,21 +139,19 @@ export function Kader() {
           <div className="divide-y divide-[#e0e0e0]">
             {filteredPlayers.map(player => {
               const avatarUrl = getPlayerAvatar(player.name, player.avatar);
+              const isAufgestellt = player.status === 'FIELD';
 
               return (
                 <div
                   key={player.id}
                   onClick={() => cyclePlayerStatus(player.id)}
-                  className={cn(
-                    "flex items-center h-10 px-3 transition-colors cursor-pointer select-none",
-                    player.status === 'OUT' ? "bg-[#f4f4f4]/40 hover:bg-[#f4f4f4]" : "hover:bg-[#f4f4f4] active:bg-[#e0e0e0]"
-                  )}
+                  className="flex items-center h-10 px-3 transition-colors cursor-pointer select-none hover:bg-[#f4f4f4] active:bg-[#e0e0e0]"
                 >
                   {/* Left Column: Avatar + Name */}
                   <div className="flex items-center flex-1 min-w-0 mr-3">
                     <div className={cn(
                       "w-6 h-6 border border-[#e0e0e0] bg-[#f4f4f4] overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-medium transition-opacity",
-                      player.status === 'OUT' ? "opacity-30 grayscale" : "text-[#161616]"
+                      !isAufgestellt ? "opacity-60" : "text-[#161616]"
                     )}>
                       {avatarUrl ? (
                         <img
@@ -173,40 +167,32 @@ export function Kader() {
                     <div className="ml-2.5 min-w-0 flex items-center space-x-2">
                       <p className={cn(
                         "text-xs font-semibold truncate transition-colors",
-                        player.status !== 'OUT' ? "text-[#161616]" : "text-[#8c8c8c]"
+                        isAufgestellt ? "text-[#161616]" : "text-[#525252]"
                       )}>
                         {player.name}
                       </p>
-                      {player.status === 'OUT' && (
-                        <span className="text-[9px] font-mono text-[#8c8c8c] uppercase">n.n.</span>
-                      )}
                     </div>
                   </div>
 
-                  {/* Right Column: 3-State Toggle Button */}
+                  {/* Right Column: 2-State Toggle Option */}
                   <div className="shrink-0 flex items-center space-x-1.5">
                     <div
                       className={cn(
-                        "w-24 h-7 flex items-center justify-center space-x-1 border text-xs font-mono transition-colors",
-                        player.status === 'FIELD' && "bg-[#0f62fe] border-[#0f62fe] text-white font-bold",
-                        player.status === 'BENCH' && "bg-[#f4f4f4] border-[#e0e0e0] text-[#161616] font-semibold",
-                        player.status === 'OUT' && "bg-white border-[#e0e0e0] text-[#8c8c8c]"
+                        "w-36 h-7 flex items-center justify-center space-x-1.5 border text-xs font-mono transition-colors",
+                        isAufgestellt 
+                          ? "bg-[#0f62fe] border-[#0f62fe] text-white font-bold" 
+                          : "bg-[#f4f4f4] border-[#e0e0e0] text-[#525252] hover:border-[#8c8c8c]"
                       )}
                     >
-                      {player.status === 'FIELD' ? (
+                      {isAufgestellt ? (
                         <>
                           <Shirt size={12} strokeWidth={2} />
                           <span className="text-[10px] uppercase font-bold tracking-tight">Aufgestellt</span>
                         </>
-                      ) : player.status === 'BENCH' ? (
-                        <>
-                          <Armchair size={12} strokeWidth={2} className="text-[#525252]" />
-                          <span className="text-[10px] uppercase font-bold tracking-tight">Bank</span>
-                        </>
                       ) : (
                         <>
-                          <CircleSlash size={11} strokeWidth={2} />
-                          <span className="text-[10px] uppercase font-medium tracking-tight">n.n.</span>
+                          <CircleSlash size={11} strokeWidth={1.5} className="text-[#8c8c8c]" />
+                          <span className="text-[10px] uppercase font-medium tracking-tight">Nicht aufgestellt</span>
                         </>
                       )}
                     </div>
@@ -232,7 +218,7 @@ export function Kader() {
       {/* Bottom Sticky CTA: Proceed to Lineup - 36px bar right above bottom nav */}
       <div className="fixed bottom-11 inset-x-0 h-9 px-3 bg-[#f4f4f4] border-t border-[#e0e0e0] flex items-center justify-between z-30">
         <div className="text-xs text-[#525252]">
-          <strong className="text-[#161616] font-mono">{selectedCount}</strong> Spieler nominiert
+          <strong className="text-[#161616] font-mono">{fieldPlayers.length}</strong> Spieler aufgestellt
         </div>
         <Button
           size="xs"
