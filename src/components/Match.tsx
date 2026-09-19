@@ -14,7 +14,10 @@ export function Match() {
       <Card className="w-full max-w-sm mb-16 bg-stone-900 border-stone-800 shadow-xl overflow-hidden rounded-3xl">
         <CardContent className="p-6 flex items-center justify-between">
           <div className="flex flex-col items-center space-y-4">
-            <span className="text-stone-400 font-medium uppercase tracking-wider text-sm">Heim</span>
+            <div className="flex items-center space-x-1.5">
+              <img src="/assets/logo.png" alt="Team Logo" className="w-5 h-5 object-contain" referrerPolicy="no-referrer" onError={(e) => (e.target as HTMLElement).style.display = 'none'} />
+              <span className="text-stone-400 font-medium uppercase tracking-wider text-sm">Heim</span>
+            </div>
             <div className="flex items-center space-x-3 bg-stone-950 rounded-2xl p-2 border border-stone-800">
               <Button size="icon" variant="secondary" onClick={() => updateScore(-1, 0)} className="h-12 w-12 rounded-xl bg-stone-800 text-stone-300 hover:bg-stone-700 hover:text-stone-100 transition-colors"><Minus size={20}/></Button>
               <span className="text-4xl font-bold font-mono w-12 text-center text-stone-100">{match.scoreHome}</span>

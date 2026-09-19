@@ -1,4 +1,5 @@
 import { useStore } from '../store';
+import { getPlayerAvatar } from '../lib/avatars';
 import { X, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
@@ -22,15 +23,37 @@ export function Wechsel() {
               {wechselQueue.map(w => {
                 const outPlayer = players.find(p => p.id === w.outPlayerId);
                 const inPlayer = players.find(p => p.id === w.inPlayerId);
+                const outAvatar = outPlayer ? getPlayerAvatar(outPlayer.name, outPlayer.avatar) : null;
+                const inAvatar = inPlayer ? getPlayerAvatar(inPlayer.name, inPlayer.avatar) : null;
                 
                 return (
                   <Card key={w.id} className="bg-stone-900 border-stone-800">
                     <CardContent className="p-4 flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-2 text-stone-300">
-                          <span className="font-semibold text-rose-500">{outPlayer?.name || 'OUT'}</span>
-                          <ArrowRight size={16} className="text-stone-500" />
-                          <span className="font-semibold text-emerald-500">{inPlayer?.name || 'IN'}</span>
+                      <div className="flex items-center space-x-3 text-stone-300">
+                        {/* Out Player */}
+                        <div className="flex items-center space-x-2">
+                          <div className="w-8 h-8 rounded-full bg-stone-800 border border-rose-500/50 overflow-hidden flex items-center justify-center text-xs font-bold text-stone-300">
+                            {outAvatar ? (
+                              <img src={outAvatar} alt={outPlayer?.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            ) : (
+                              outPlayer?.name.substring(0, 2)
+                            )}
+                          </div>
+                          <span className="font-semibold text-rose-400 text-sm">{outPlayer?.name || 'OUT'}</span>
+                        </div>
+
+                        <ArrowRight size={16} className="text-stone-500 shrink-0" />
+
+                        {/* In Player */}
+                        <div className="flex items-center space-x-2">
+                          <div className="w-8 h-8 rounded-full bg-stone-800 border border-emerald-500/50 overflow-hidden flex items-center justify-center text-xs font-bold text-stone-300">
+                            {inAvatar ? (
+                              <img src={inAvatar} alt={inPlayer?.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            ) : (
+                              inPlayer?.name.substring(0, 2)
+                            )}
+                          </div>
+                          <span className="font-semibold text-emerald-400 text-sm">{inPlayer?.name || 'IN'}</span>
                         </div>
                       </div>
                       <Button variant="ghost" size="icon" onClick={() => removeWechsel(w.id)} className="text-stone-500 hover:text-stone-300 hover:bg-stone-800 transition-colors">

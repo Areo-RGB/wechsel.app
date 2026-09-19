@@ -1,5 +1,6 @@
 import { useStore } from '../store';
 import { formatTime } from '../lib/utils';
+import { getPlayerAvatar } from '../lib/avatars';
 import {
   Table,
   TableBody,
@@ -36,14 +37,26 @@ export function Daten() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {stats.map(p => (
-              <TableRow key={p.id} className="border-stone-800/50 text-stone-300 hover:bg-stone-800/50 transition-colors">
-                <TableCell className="font-semibold">{p.name}</TableCell>
-                <TableCell className="text-right font-mono">{formatTime(p.feldzeit)}</TableCell>
-                <TableCell className="text-right font-mono text-emerald-500">{Math.round(p.percent)}%</TableCell>
-                <TableCell className="text-right font-mono">{formatTime(p.total)}</TableCell>
-              </TableRow>
-            ))}
+            {stats.map(p => {
+              const avatar = getPlayerAvatar(p.name, p.avatar);
+              return (
+                <TableRow key={p.id} className="border-stone-800/50 text-stone-300 hover:bg-stone-800/50 transition-colors">
+                  <TableCell className="font-semibold flex items-center space-x-2.5 py-2.5">
+                    <div className="w-7 h-7 rounded-full bg-stone-800 border border-stone-700 overflow-hidden flex items-center justify-center text-[10px] font-bold text-stone-300 shrink-0">
+                      {avatar ? (
+                        <img src={avatar} alt={p.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      ) : (
+                        p.name.substring(0, 2).toUpperCase()
+                      )}
+                    </div>
+                    <span>{p.name}</span>
+                  </TableCell>
+                  <TableCell className="text-right font-mono text-xs">{formatTime(p.feldzeit)}</TableCell>
+                  <TableCell className="text-right font-mono text-xs text-emerald-400 font-bold">{Math.round(p.percent)}%</TableCell>
+                  <TableCell className="text-right font-mono text-xs text-stone-400">{formatTime(p.total)}</TableCell>
+                </TableRow>
+              );
+            })}
             {stats.length === 0 && (
               <TableRow className="hover:bg-transparent border-0">
                 <TableCell colSpan={4} className="h-24 text-center text-stone-500">

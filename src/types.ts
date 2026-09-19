@@ -7,6 +7,7 @@ export interface Player {
   positionId: string | null;
   feldzeit: number; // in seconds
   bankzeit: number; // in seconds
+  avatar?: string;
 }
 
 export interface MatchState {
@@ -30,3 +31,4 @@ export interface PositionSlot {
 }
 
 export type TabId = 'KADER' | 'AUFSTELLUNG' | 'MATCH' | 'WECHSEL' | 'DATEN';
+
