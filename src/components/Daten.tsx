@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { Card } from './ui/card';
 
 export function Daten() {
   const players = useStore(state => state.players);
@@ -24,49 +23,58 @@ export function Daten() {
     .sort((a, b) => b.percent - a.percent);
 
   return (
-    <div className="p-4 overflow-y-auto pb-24 h-full bg-stone-950">
-      <h2 className="text-xl font-bold mb-6 text-stone-100">Daten</h2>
-      <Card className="bg-stone-900 border-stone-800 overflow-hidden">
-        <Table>
-          <TableHeader className="bg-stone-950/50">
-            <TableRow className="border-stone-800 hover:bg-transparent">
-              <TableHead className="text-stone-400 font-medium">NAME</TableHead>
-              <TableHead className="text-stone-400 font-medium text-right">Sp.</TableHead>
-              <TableHead className="text-stone-400 font-medium text-right">%</TableHead>
-              <TableHead className="text-stone-400 font-medium text-right">Σ min</TableHead>
+    <div className="overflow-y-auto pb-16 h-full bg-white text-[#161616] flex flex-col select-none">
+      {/* Condensed Header */}
+      <div className="h-9 px-3 bg-[#f4f4f4] border-b border-[#e0e0e0] flex items-center justify-between shrink-0">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.32px] text-[#525252]">
+          Spieldaten & Einsatzzeiten
+        </h2>
+        <span className="font-mono text-xs text-[#161616] font-bold">
+          {stats.length} Spieler
+        </span>
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        <Table className="w-full text-xs">
+          <TableHeader className="bg-[#f4f4f4] sticky top-0 z-10">
+            <TableRow className="border-b border-[#e0e0e0] hover:bg-transparent h-7">
+              <TableHead className="text-[#525252] font-semibold text-[10px] uppercase tracking-[0.32px] px-3">Name</TableHead>
+              <TableHead className="text-[#525252] font-semibold text-[10px] uppercase tracking-[0.32px] text-right px-2">Spielzeit</TableHead>
+              <TableHead className="text-[#525252] font-semibold text-[10px] uppercase tracking-[0.32px] text-right px-2">Anteil</TableHead>
+              <TableHead className="text-[#525252] font-semibold text-[10px] uppercase tracking-[0.32px] text-right px-3">Gesamt</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="divide-y divide-[#e0e0e0]">
             {stats.map(p => {
               const avatar = getPlayerAvatar(p.name, p.avatar);
               return (
-                <TableRow key={p.id} className="border-stone-800/50 text-stone-300 hover:bg-stone-800/50 transition-colors">
-                  <TableCell className="font-semibold flex items-center space-x-2.5 py-2.5">
-                    <div className="w-7 h-7 rounded-full bg-stone-800 border border-stone-700 overflow-hidden flex items-center justify-center text-[10px] font-bold text-stone-300 shrink-0">
+                <TableRow key={p.id} className="hover:bg-[#f4f4f4] transition-colors h-9">
+                  <TableCell className="font-medium flex items-center space-x-2 py-1.5 px-3">
+                    <div className="w-5 h-5 border border-[#e0e0e0] bg-[#f4f4f4] overflow-hidden flex items-center justify-center text-[9px] font-semibold text-[#161616] shrink-0">
                       {avatar ? (
                         <img src={avatar} alt={p.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                       ) : (
                         p.name.substring(0, 2).toUpperCase()
                       )}
                     </div>
-                    <span>{p.name}</span>
+                    <span className="truncate max-w-[130px]">{p.name}</span>
                   </TableCell>
-                  <TableCell className="text-right font-mono text-xs">{formatTime(p.feldzeit)}</TableCell>
-                  <TableCell className="text-right font-mono text-xs text-emerald-400 font-bold">{Math.round(p.percent)}%</TableCell>
-                  <TableCell className="text-right font-mono text-xs text-stone-400">{formatTime(p.total)}</TableCell>
+                  <TableCell className="text-right font-mono text-xs text-[#161616] px-2">{formatTime(p.feldzeit)}</TableCell>
+                  <TableCell className="text-right font-mono text-xs text-[#0f62fe] font-bold px-2">{Math.round(p.percent)}%</TableCell>
+                  <TableCell className="text-right font-mono text-xs text-[#8c8c8c] px-3">{formatTime(p.total)}</TableCell>
                 </TableRow>
               );
             })}
             {stats.length === 0 && (
               <TableRow className="hover:bg-transparent border-0">
-                <TableCell colSpan={4} className="h-24 text-center text-stone-500">
-                  Noch keine Daten vorhanden
+                <TableCell colSpan={4} className="h-28 text-center text-[#8c8c8c] text-xs">
+                  Noch keine Spieldaten vorhanden
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
-      </Card>
+      </div>
     </div>
   );
 }

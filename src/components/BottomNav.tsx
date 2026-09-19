@@ -15,8 +15,8 @@ export function BottomNav() {
   const { activeTab, setTab } = useStore();
 
   return (
-    <nav className="fixed bottom-0 w-full bg-stone-900 border-t border-stone-800 text-stone-400 pb-safe z-50">
-      <div className="flex justify-around items-center h-16">
+    <nav className="fixed bottom-0 w-full bg-white border-t border-[#e0e0e0] text-[#525252] z-50 select-none">
+      <div className="flex justify-around items-stretch h-11">
         {TABS.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id || (tab.id === 'AUFSTELLUNG' && activeTab === 'MATCH');
@@ -26,12 +26,17 @@ export function BottomNav() {
               key={tab.id}
               onClick={() => setTab(tab.id)}
               className={cn(
-                "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
-                isActive ? "text-emerald-500" : "hover:text-stone-200"
+                "relative flex flex-col items-center justify-center flex-1 h-full py-1 transition-colors rounded-none",
+                isActive 
+                  ? "text-[#0f62fe] bg-white font-medium" 
+                  : "text-[#525252] hover:text-[#161616] hover:bg-[#f4f4f4]"
               )}
             >
-              <Icon size={20} />
-              <span className="text-[10px] uppercase font-medium tracking-wider">{tab.label}</span>
+              {isActive && (
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#0f62fe]" />
+              )}
+              <Icon size={16} strokeWidth={isActive ? 2.2 : 1.8} />
+              <span className="text-[11px] leading-tight mt-0.5 tracking-[0.16px]">{tab.label}</span>
             </button>
           );
         })}

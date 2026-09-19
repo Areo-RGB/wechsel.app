@@ -35,7 +35,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-[100dvh] w-full bg-stone-950 text-stone-100 overflow-hidden font-sans select-none">
+    <div className="flex flex-col h-[100dvh] w-full bg-white text-[#161616] overflow-hidden font-sans select-none antialiased">
       <main className="flex-1 relative overflow-hidden">
         {renderTab()}
       </main>
